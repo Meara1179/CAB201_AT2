@@ -22,18 +22,6 @@ namespace CAB201_AT2
         }
 
         /// <summary>
-        /// Adds the list of fences to the obstacle list.
-        /// </summary>
-        /// <param name="obs"></param>
-        public void AddFence(List<Obstacle> obs)
-        {
-            foreach (Obstacle ob in obstaclesList) 
-            {
-                obstaclesList.Add(ob);
-            }
-        }
-
-        /// <summary>
         /// Creates a 2d List of the specified region and iterates through the obstacle list adding any that fall within the region to the 2d List.
         /// </summary>
         /// <param name="swX"></param>

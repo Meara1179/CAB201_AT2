@@ -16,7 +16,7 @@ namespace CAB201_AT2
         /// </summary>
         public void StartReadInput()
         {
-            Console.WriteLine("Please input command...");
+            Console.WriteLine("Enter command:");
             string input = Console.ReadLine();
             if (input != null)
             {
@@ -89,19 +89,19 @@ namespace CAB201_AT2
                                 {
                                     Console.WriteLine("Direction must be 'north' or 'east'.");
                                 }
-                                else if (int.Parse(dir) != (int)DirectionEnum.North || int.Parse(dir) != (int)DirectionEnum.East)
-                                {
-                                    Console.WriteLine("Direction must be 'north' or 'east'.");
-                                }
-                                else
+                                else if (int.Parse(dir) == (int)DirectionEnum.North || int.Parse(dir) == (int)DirectionEnum.East)
                                 {
                                     int length;
                                     if (int.TryParse(inputArgs[5], out length))
                                     {
-                                        mapCreator.AddFence(obCreator.CreateFence(int.Parse(inputArgs[2]), int.Parse(inputArgs[3]), int.Parse(dir), length));
+                                        mapCreator.AddObstacle(obCreator.CreateFence(int.Parse(inputArgs[2]), int.Parse(inputArgs[3]), int.Parse(dir), length));
                                         Console.WriteLine("Fence added.");
                                     }
                                     else Console.WriteLine("Length not valid.");
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Direction must be 'north' or 'east'.");
                                 }
                             }
                             break;

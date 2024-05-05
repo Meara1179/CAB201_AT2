@@ -73,24 +73,9 @@ namespace CAB201_AT2
         /// <param name="yPos"></param>
         /// <param name="length"></param>
         /// <returns></returns>
-        public List<Obstacle> CreateFence(int direction, int xPos, int yPos, int length)
+        public Obstacle CreateFence(int xPos, int yPos, int direction, int length)
         {
-            List<Obstacle> fenceList = new List<Obstacle>();
-            switch (direction) {
-                case (int)DirectionEnum.North:
-                    for (int i = 0; i < length; i++)
-                    {
-                        fenceList.Add(new Obstacle((int)TypeEnum.Fence, 0, (int)DirectionEnum.North, xPos, yPos + i));
-                    }
-                    return fenceList;
-                case (int)DirectionEnum.East:
-                    for (int i = 0; i < length; i++)
-                    {
-                        fenceList.Add(new Obstacle((int)TypeEnum.Fence, 0, (int)DirectionEnum.North, xPos + i, yPos));
-                    }
-                    return fenceList;
-                default: return fenceList;
-            }
+            return new Obstacle((int)TypeEnum.Fence, length, direction, xPos, yPos);
         }
 
         /// <summary>
@@ -109,6 +94,21 @@ namespace CAB201_AT2
             else if (Type == (int)TypeEnum.Camera)
             {
                 return CameraCheckDanger(XPos, YPos, agentX, agentY, Direction);
+            }
+            else if (Type == (int)TypeEnum.Fence)
+            {
+                for (int i = 0; i < (int)Radius; i++)
+                {
+                    if (Direction == (int)DirectionEnum.North)
+                    {
+                        if (agentX == XPos && agentY == YPos + i) return true;
+                    }
+                    else if (Direction == (int)DirectionEnum.East)
+                    {
+                        if (agentX == XPos + i && agentY == YPos) return true;
+                    }
+                }
+                return false;
             }
             else return false;
         }

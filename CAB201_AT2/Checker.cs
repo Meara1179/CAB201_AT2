@@ -75,6 +75,7 @@ namespace CAB201_AT2
                 {
                     IsDanger = true;
                     IsDeadEnd = true;
+                    break;
                 }
                 else
                 {
