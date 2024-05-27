@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CAB201_AT2.Obstacles;
 
 namespace CAB201_AT2
 {
@@ -51,7 +52,7 @@ namespace CAB201_AT2
                         case "guard":
                             if (ValidateNumArgs(inputArgs[2], inputArgs[3]))
                             {
-                                mapCreator.AddObstacle(obCreator.CreateGuard(int.Parse(inputArgs[2]), int.Parse(inputArgs[3])));
+                                mapCreator.AddObstacle(new GuardObs(int.Parse(inputArgs[2]), int.Parse(inputArgs[3])));
                                 Console.WriteLine("Guard added.");
                             }
                             else Console.WriteLine("X and Y positions are not valid.");
@@ -60,7 +61,7 @@ namespace CAB201_AT2
                         case "sensor":
                             if (ValidateNumArgs(inputArgs[2], inputArgs[3], inputArgs[4]))
                             {
-                                mapCreator.AddObstacle(obCreator.CreateSensor(int.Parse(inputArgs[2]), int.Parse(inputArgs[3]), double.Parse(inputArgs[4])));
+                                mapCreator.AddObstacle(new SensorObs(int.Parse(inputArgs[2]), int.Parse(inputArgs[3]), double.Parse(inputArgs[4])));
                                 Console.WriteLine("Sensor added.");
                             }
                             break;
@@ -75,7 +76,7 @@ namespace CAB201_AT2
                                 }
                                 else
                                 {
-                                    mapCreator.AddObstacle(obCreator.CreateCamera(int.Parse(inputArgs[2]), int.Parse(inputArgs[3]), int.Parse(inputArgs[4])));
+                                    mapCreator.AddObstacle(new CameraObs(int.Parse(inputArgs[2]), int.Parse(inputArgs[3]), int.Parse(dir)));
                                     Console.WriteLine("Camera added.");
                                 }
                             }
@@ -94,7 +95,7 @@ namespace CAB201_AT2
                                     int length;
                                     if (int.TryParse(inputArgs[5], out length))
                                     {
-                                        mapCreator.AddObstacle(obCreator.CreateFence(int.Parse(inputArgs[2]), int.Parse(inputArgs[3]), int.Parse(dir), length));
+                                        mapCreator.AddObstacle(new FenceObs(int.Parse(inputArgs[2]), int.Parse(inputArgs[3]), int.Parse(dir), length));
                                         Console.WriteLine("Fence added.");
                                     }
                                     else Console.WriteLine("Length not valid.");

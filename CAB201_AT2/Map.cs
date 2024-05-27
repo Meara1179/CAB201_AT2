@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CAB201_AT2.Obstacles;
 
 namespace CAB201_AT2
 {
@@ -29,6 +30,8 @@ namespace CAB201_AT2
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <returns></returns>
+
+        // TODO Fix Map not placing objects properly.
         public List<List<string>> GenerateVisualMap(int swX, int swY, int width, int height)
         {
             List<List<string>> map = new List<List<string>>();
@@ -42,21 +45,7 @@ namespace CAB201_AT2
                     {
                         if (ob.CheckDanger(swX + i, swY + j) == true)
                         {
-                            switch (ob.Type)
-                            {
-                                case (int)TypeEnum.Guard:
-                                    map[i].Add("G");
-                                    break;
-                                case (int)TypeEnum.Sensor:
-                                    map[i].Add("S");
-                                    break;
-                                case (int)TypeEnum.Camera:
-                                    map[i].Add("C");
-                                    break;
-                                case (int)TypeEnum.Fence:
-                                    map[i].Add("F");
-                                    break;
-                            }
+                            map[i].Add(ob.MapMarker());
                         }
                         else map[i].Add(".");
                     }
