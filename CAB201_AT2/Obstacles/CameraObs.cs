@@ -51,33 +51,33 @@ namespace CAB201_AT2.Obstacles
             {
                 case (int)DirectionEnum.North:
                     length = yValue;
-                    agentLength = yValue;
+                    agentLength = agentY;
                     width = xValue;
-                    agentWidth = xValue;
+                    agentWidth = agentX;
                     distance = Math.Abs(agentY - yValue);
                     numSign = 1;
                     break;
                 case (int)DirectionEnum.East:
                     length = xValue;
-                    agentLength = xValue;
+                    agentLength = agentX;
                     width = yValue;
-                    agentWidth = yValue;
+                    agentWidth = agentY;
                     distance = Math.Abs(agentX - xValue);
                     numSign = 1;
                     break;
                 case (int)DirectionEnum.South:
                     length = yValue;
-                    agentLength = yValue;
+                    agentLength = agentY;
                     width = xValue;
-                    agentWidth = xValue;
+                    agentWidth = agentX;
                     distance = Math.Abs(agentY - yValue);
                     numSign = -1;
                     break;
                 case (int)DirectionEnum.West:
                     length = xValue;
-                    agentLength = xValue;
+                    agentLength = agentX;
                     width = yValue;
-                    agentWidth = yValue;
+                    agentWidth = agentY;
                     distance = Math.Abs(agentX - xValue);
                     numSign = -1;
                     break;
@@ -85,7 +85,7 @@ namespace CAB201_AT2.Obstacles
 
             for (int i = 1; i <= distance; i++)
             {
-                if (length + i * numSign == agentWidth && width == agentWidth)
+                if (length + i * numSign == agentLength && width == agentWidth)
                 {
                     return true;
                 }

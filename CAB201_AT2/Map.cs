@@ -31,7 +31,6 @@ namespace CAB201_AT2
         /// <param name="height"></param>
         /// <returns></returns>
 
-        // TODO Fix Map not placing objects properly.
         public List<List<string>> GenerateVisualMap(int swX, int swY, int width, int height)
         {
             List<List<string>> map = new List<List<string>>();
@@ -41,14 +40,22 @@ namespace CAB201_AT2
                 map.Add(new List<string>());
                 for (int j = 0; j < height; j++)
                 {
-                    foreach (Obstacle ob in obstaclesList)
+                    map[i].Add("");
+                    if (obstaclesList.Any())
                     {
-                        if (ob.CheckDanger(swX + i, swY + j) == true)
+                        foreach (Obstacle ob in obstaclesList)
                         {
-                            map[i].Add(ob.MapMarker());
+                            if (ob.CheckDanger(swX + i, swY + j) == true)
+                            {
+                                map[i][j] = ob.MapMarker();
+                            }
+                            else if (map[i][j] == "")
+                            {
+                                map[i][j] = ".";
+                            }
                         }
-                        else map[i].Add(".");
                     }
+                    else map[i][j] = ".";
                 }
             }
 
