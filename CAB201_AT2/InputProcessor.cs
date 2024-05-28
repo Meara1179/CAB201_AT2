@@ -11,6 +11,8 @@ namespace CAB201_AT2
     {
         Obstacle obCreator = new Obstacle();
         Map mapCreator = new Map();
+        Checker checker = new Checker();
+        Pathfinder pathfinder = new Pathfinder();
 
         /// <summary>
         /// Method that reads the user's input and processes it using the InputReader method, then calls itself afterwards.
@@ -112,11 +114,9 @@ namespace CAB201_AT2
                     }
                     break;
                 case "check":
-                    // TODO Implement Check method in Map
                     if (ValidateNumArgs(inputArgs[1], inputArgs[2]))
                     {
-                        new Checker(int.Parse(inputArgs[1]), int.Parse(inputArgs[2]), int.Parse(inputArgs[1]), int.Parse(inputArgs[2]), 
-                            int.Parse(inputArgs[1]), int.Parse(inputArgs[2]), null, 0);
+                        new Checker(int.Parse(inputArgs[1]), int.Parse(inputArgs[2]));
                     }
                     break;
                 // Creates a visual text map displaying all obstacles in the specified region.
@@ -141,7 +141,12 @@ namespace CAB201_AT2
                     break;
                 case "path":
                     // TODO Implement Path method in Map
-                    Console.WriteLine("Not Implemented");
+                    if (ValidateNumArgs(inputArgs[1], inputArgs[2]) && ValidateNumArgs(inputArgs[3], inputArgs[4]))
+                    {
+                        pathfinder.StartPath(int.Parse(inputArgs[1]), int.Parse(inputArgs[2]),
+                        int.Parse(inputArgs[3]), int.Parse(inputArgs[4]), mapCreator.ReturnObstacleList());
+                        Console.WriteLine("Test");
+                    }
                     break;
                 // Reposts the help text.
                 case "help":

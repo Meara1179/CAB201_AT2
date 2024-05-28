@@ -61,5 +61,10 @@ namespace CAB201_AT2
 
             return map;
         }
+
+        public List<Obstacle> ReturnObstacleList()
+        {
+            return obstaclesList;
+        }
     }
 }
