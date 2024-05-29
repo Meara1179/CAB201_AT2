@@ -10,8 +10,6 @@ namespace CAB201_AT2
     internal class Map
     {
         static public List<Obstacle> obstaclesList = new List<Obstacle>();
-        List<Movement> bestRoute = new List<Movement>();
-        int bestMoveCount;
 
         /// <summary>
         /// Adds the supplied obstacle to the obstacle list.

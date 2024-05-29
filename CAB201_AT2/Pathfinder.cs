@@ -1,6 +1,8 @@
 ﻿using CAB201_AT2.Obstacles;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -10,159 +12,176 @@ namespace CAB201_AT2
 {
     internal class Pathfinder
     {
-        static List<PathNode> openNodes = new List<PathNode>();
-        static List<PathNode> closedNodes = new List<PathNode>();
 
-        public Pathfinder()
+        public Tuple<Point, Point> CreateStartAndTarget(int startX, int startY, int endX, int endY)
         {
+            Point start = new Point(startX, startY);
+            Point target = new Point(endX, endY);
 
+            return Tuple.Create(start, target);
         }
 
-        public void StartPath(int startX, int startY, int endX, int endY, List<Obstacle> obstacleListArg)
+        public List<Node> StartPath(Point start, Point target)
         {
-            List<Obstacle> obstacleList = new List<Obstacle>();
-            bool atEnd = false;
+            List<Node> openNodes = new List<Node>();
+            List<Node> closedNodes = new List<Node>();
 
-            if (obstacleListArg.Any()) 
-            {
-                obstacleList = obstacleListArg;
-            }
-            PathNode currentNode = new PathNode(startX, startY, startX, startY, endX, endY, obstacleList);
-            openNodes.Add(currentNode);
-            currentNode.CreateNeighbours();
-            // TODO Add limit.
-            while (!atEnd)
-            {
-                //Console.WriteLine($"X: {currentNode.XPos}, Y: {currentNode.YPos}");
-                currentNode = FindClosestNode();
-                currentNode.CreateNeighbours();
-                openNodes.Remove(currentNode);
-                closedNodes.Add(currentNode);
+            Node startNode = new Node(start);
+            startNode.G = 0;
+            startNode.H = startNode.FindDist(target);
 
-                if (currentNode.CheckIfAtEnd())
+            openNodes.Add(startNode);
+            bool pathFound = start.Equals(target);
+
+            Node? endNode = null;
+            int maxIteration = 6000;
+            int currentIteration = 0;
+
+            while (openNodes.Any() && (!pathFound) && (++currentIteration <= maxIteration))
+            {
+                if (currentIteration == maxIteration - 1)
                 {
-                    atEnd = true;
-                    //Console.WriteLine($"X: {currentNode.XPos}, Y: {currentNode.YPos}");
+                    Console.WriteLine("SIGH");
                 }
-                else
+
+                Node current = this.FindLowestCost(openNodes);
+                closedNodes.Add(current);
+
+                foreach (Point p in current.Neighbours)
                 {
-                    foreach (PathNode node in currentNode.neighbours)
+                    if (p.CheckDanger()) continue;
+
+                    Node neighbour = new Node(p);
+                    endNode = neighbour;
+
+                    double newG = current.G + 1;
+                    double newH = neighbour.FindDist(target);
+                    
+                    void updateNeighbour()
                     {
-                        if (!closedNodes.Contains(node) && !openNodes.Contains(node))
-                        {
-                            openNodes.Add(node);
-                        }
+                        neighbour.G = newG;
+                        neighbour.H = newH;
+                        neighbour.ParentNode = current;
                     }
-                }
-            }
 
-            PrintDirections(currentNode);
-        }
+                    //bool canAddOpen = true;
+                    //for (int i = 0; i < openNodes.Count; i++)
+                    //{
+                    //    if (neighbour.Equals(openNodes[i]))
+                    //    {
+                    //        canAddOpen = false;
+                    //        break;
+                    //    }
+                    //}
+                    //bool canAddClosed = true;
+                    //for (int i = 0; i < closedNodes.Count; i++)
+                    //{
+                    //    if (neighbour.Equals(closedNodes[i]))
+                    //    {
+                    //        canAddClosed = false;
+                    //        break;
+                    //    }
+                    //}
 
-        private PathNode FindClosestNode()
-        {
-            List<PathNode> shortestNodes = new List<PathNode>();
-
-            double minCost = openNodes.Min(x => x.Cost);
-            foreach (PathNode node in openNodes)
-            {
-                if (node.Cost == minCost) { shortestNodes.Add(node); }
-            }
-            if (shortestNodes.Count > 1) 
-            {
-                double shortestDistToEnd = shortestNodes.Min(x => x.DistanceToEnd);
-                foreach (PathNode node in openNodes)
-                {
-                    if (node.DistanceToEnd != shortestDistToEnd) { shortestNodes.Remove(node); }
-                }
-                if (shortestNodes.Count > 1)
-                {
-                    double shortestDistFromStart = shortestNodes.Min(x => x.DistanceFromStart);
-                    foreach (PathNode node in openNodes)
+                    //Point neighbourPoint = new Point(neighbour.X, neighbour.Y);
+                    if (neighbour.Equals(target))
                     {
-                        if (node.DistanceFromStart != shortestDistFromStart) { shortestNodes.Remove(node); }
+                        updateNeighbour();
+                        pathFound = true;
+                        Console.WriteLine("FOUND");
+                        break;
                     }
+                    else if (!openNodes.Contains(neighbour) && !closedNodes.Contains(neighbour))
+                    {
+                        updateNeighbour();
+                        openNodes.Add(neighbour);
+                    }
+                    //else if (neighbour.G > newG)
+                    //{
+                    //    updateNeighbour();
+                    //    openNodes.Add(neighbour);
+                    //    closedNodes.Remove(neighbour);
+                    //}
                 }
             }
-            return shortestNodes[0];
+
+            List<Node> path = new List<Node>();
+            if (pathFound)
+            {
+                Node? node = endNode;
+
+                while (node != null)
+                {
+                    path.Add(node);
+                    node = node.ParentNode;
+                }
+                path.Reverse();
+            }
+            return path;
         }
 
-        private void PrintDirections(PathNode node)
+        public void ProcessPath(List<Node> path)
         {
-            PathNode currentNode = node;
-            bool atStart = false;
-            List<Tuple<int, int>> cords = new List<Tuple<int, int>>();
-            List<Tuple<string, int>> path = new List<Tuple<string, int>>();
-
-            while (!atStart)
-            {
-                if (currentNode.ParentNode != null)
-                {
-                    cords.Add(new Tuple<int, int>(currentNode.XPos, currentNode.YPos));
-                    currentNode = currentNode.ParentNode;
-                }
-                else
-                {
-                    cords.Add(new Tuple<int, int>(currentNode.XPos, currentNode.YPos));
-                    atStart = true;
-                    cords.Reverse();
-                }
-            }
-            int count = 0;
+            List<Tuple<string, int>> directions = new List<Tuple<string, int>>();
             string currDir = "";
             string prevDir = "";
+            int count = -1;
 
-            for (int i = 0; i < cords.Count - 1; i++)
+            for (int i = 0; i < path.Count - 1; i++)
             {
-                if (cords[i].Item2 < cords[i + 1].Item2)
-                {
-                    currDir = "north";
-                }
-                else if (cords[i].Item1 < cords[i + 1].Item1)
-                {
-                    currDir = "east";
-                }
-                else if (cords[i].Item2 > cords[i + 1].Item2)
-                {
-                    currDir = "south";
-                }
-                else if (cords[i].Item1 > cords[i + 1].Item1)
-                {
-                    currDir = "west";
-                }
-                
-                if (i == 0) { prevDir =  currDir; }
+                count++;
+                if (path[i].Y < path[i + 1].Y) { currDir = "north"; }
+                else if (path[i].X < path[i + 1].X) { currDir = "east"; }
+                else if (path[i].Y > path[i + 1].Y) { currDir = "south"; }
+                else if (path[i].X > path[i + 1].X) { currDir = "west"; }
+                if (i == 0) { prevDir = currDir; }
 
-                if (currDir == prevDir)
+                if (currDir != prevDir)
                 {
-                    count++;
-                    if (i == cords.Count - 2)
-                    {
-                        count++;
-                        path.Add(new Tuple<string, int>(currDir, count));
-                    }
-                }
-                else
-                {
-                    count++;
-                    path.Add(new Tuple<string, int>(prevDir, count));
-                    prevDir = currDir;
+                    directions.Add(new Tuple<string, int>(prevDir, count));
                     count = 0;
                 }
+                if (i == path.Count - 2) directions.Add(new Tuple<string, int>(prevDir, count + 1));
+                prevDir = currDir;
             }
 
-            foreach (Tuple<string, int> p in path)
+            Console.WriteLine("The following path will take you to the objective:");
+            foreach(Tuple<string, int> s in directions)
             {
-                if (p.Item2 == 1)
+                if (s.Item2 <= 1)
                 {
-                    Console.WriteLine($"Head {p.Item1} for {p.Item2} klick.");
+                    Console.WriteLine($"Head {s.Item1} for {s.Item2} klick");
                 }
                 else
                 {
-                    Console.WriteLine($"Head {p.Item1} for {p.Item2} klicks.");
+                    Console.WriteLine($"Head {s.Item1} for {s.Item2} klicks");
                 }
-                
-            }    
+            }
+        }
+
+        private Node FindLowestCost(List<Node> open)
+        {
+            double minCost = double.MaxValue;
+            double minH = double.MaxValue;
+            Node? minNode = null;
+
+            foreach (Node node in open)
+            {
+                if (node.F < minCost)
+                {
+                    minNode = node;
+                    minCost = (double)node.F;
+                    minH = (double)node.H;
+                }
+                else if (node.F ==  minCost && node.H < minH)
+                {
+                    minNode = node;
+                    minCost = (double)node.F;
+                    minH = (double)node.H;
+                }
+            }
+            open.Remove(minNode);
+            return minNode;
         }
     }
 }

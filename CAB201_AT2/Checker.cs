@@ -23,17 +23,8 @@ namespace CAB201_AT2
         public Checker? WestTile { get; set; }
         public Checker? ParentTile { get; set; }
 
-        public bool FindPath { get; set; }
         public bool CheckChildTile { get; set; }
         public bool IsDanger = false;
-        public bool IsDeadEnd = false;
-        public bool IsEnd = false;
-
-        private int MaxDistanceX;
-        private int MaxDistanceY;
-
-        static List<Checker> endCheckers = new List<Checker>();
-        static List<string> pathToStart = new List<string>();
 
         public Checker()
         {
@@ -64,14 +55,10 @@ namespace CAB201_AT2
             EndY = endY;
             ParentTile = parentTile;
             MoveCount = moveCount;
-            FindPath = findPath;
             CheckChildTile = checkChildTile;
 
-            MaxDistanceX = (Math.Abs(StartX - EndX) + 1) * 2;
-            MaxDistanceY = (Math.Abs(StartY - EndY) + 1) * 2;
-
-            StartPath();
-            if (!FindPath &&  !CheckChildTile) { CheckNeighbourTiles(); }
+            StartCheck();
+            if (!CheckChildTile) { CheckNeighbourTiles(); }
         }
         // Checker constructor used by the Check command.
         public Checker(int xPos, int yPos)
@@ -84,154 +71,31 @@ namespace CAB201_AT2
             EndY = yPos;
             ParentTile = null;
             MoveCount = 0;
-            FindPath = false;
             CheckChildTile = false;
 
-            MaxDistanceX = (Math.Abs(StartX - EndX) + 1) * 2;
-            MaxDistanceY = (Math.Abs(StartY - EndY) + 1) * 2;
 
-            StartPath();
-            if (!FindPath && !CheckChildTile) { CheckNeighbourTiles(); }
-        }
-        // Checker constructor used by the Path command.
-        public Checker(int xPos, int yPos, int endX, int endY)
-        {
-            XPos = xPos;
-            YPos = yPos;
-            StartX = xPos;
-            StartY = yPos;
-            EndX = endX;
-            EndY = endY;
-            ParentTile = null;
-            MoveCount = 0;
-            FindPath = true;
-            CheckChildTile = false;
-
-            MaxDistanceX = (Math.Abs(StartX - EndX) + 1) * 2;
-            MaxDistanceY = (Math.Abs(StartY - EndY) + 1) * 2;
-
-            StartPath();
-            if (!FindPath && !CheckChildTile) { CheckNeighbourTiles(); }
+            StartCheck();
+            if (!CheckChildTile) { CheckNeighbourTiles(); }
         }
 
-        public List<Checker> ReturnEndCheckers()
+        private void StartCheck()
         {
-            if (endCheckers.Any())
+            foreach (Obstacle ob in Map.obstaclesList)
             {
-                return endCheckers;
-            }
-            else return new List<Checker>();
-        }
-
-        public void RetracePath()
-        {
-            if (ParentTile != null) 
-            {
-                if (ParentTile.NorthTile == this)
+                bool danger = ob.CheckDanger(XPos, YPos);
+                if (danger)
                 {
-                    pathToStart.Add("north");
+                    IsDanger = true;
+                    break;
                 }
-                else if (ParentTile.EastTile == this)
+                else
                 {
-                    pathToStart.Add("east");
-                }
-                else if (ParentTile.SouthTile == this)
-                {
-                    pathToStart.Add("south");
-                }
-                else if (ParentTile.WestTile == this) 
-                {
-                    pathToStart.Add("west");
-                }
-            }
-        }
-
-        public List<Tuple<string, int>> ProcessPath()
-        {
-            if (pathToStart.Any())
-            {
-                List<Tuple<string, int>> pathInstructions = new List<Tuple<string, int>>();
-                List<string> pathToEnd = pathToStart;
-                pathToEnd.Reverse();
-
-                int count = 0;
-                string currentDirection = pathToEnd[0];
-                foreach (string pathString in pathToEnd)
-                {
-                    count++;
-                    if (pathString != currentDirection)
+                    if (!CheckChildTile)
                     {
-                        pathInstructions.Add(new Tuple<string, int>(currentDirection, count));
-                        currentDirection = pathString;
-                        count = 0;
-                    }
-                }
-                return pathInstructions;
-            }
-            else return new List<Tuple<string, int>>();
-        }
-
-        private void StartPath()
-        {
-            if (XPos == EndX && YPos == EndY)
-            {
-                IsEnd = true;
-                endCheckers.Add(this);
-            }
-            else 
-            {
-                foreach (Obstacle ob in Map.obstaclesList)
-                {
-                    bool danger = ob.CheckDanger(XPos, YPos);
-                    if (danger)
-                    {
-                        IsDanger = true;
-                        IsDeadEnd = true;
-                        break;
-                    }
-                    else
-                    {
-                        if (!CheckChildTile)
-                        {
-                            if (FindPath)
-                            {
-                                if (Math.Abs(YPos++ - EndY) < MaxDistanceY)
-                                {
-                                    NorthTile = new Checker(XPos, YPos++, StartX, StartY, EndX, EndY, this, MoveCount++, true);
-                                }
-                                if (Math.Abs(XPos++ - EndX) < MaxDistanceX)
-                                {
-                                    EastTile = new Checker(XPos++, YPos, StartX, StartY, EndX, EndY, this, MoveCount++, true);
-                                }
-                                if (Math.Abs(YPos-- - EndY) < MaxDistanceY)
-                                {
-                                    SouthTile = new Checker(XPos, YPos--, StartX, StartY, EndX, EndY, this, MoveCount++, true);
-                                }
-                                if (Math.Abs(XPos-- - EndX) < MaxDistanceX)
-                                {
-                                    WestTile = new Checker(XPos--, YPos, StartX, StartY, EndX, EndY, this, MoveCount++, true);
-                                }
-                            }
-                            else
-                            {
-                                if (Math.Abs(YPos + 1 - EndY) < MaxDistanceY)
-                                {
-                                    NorthTile = new Checker(XPos, YPos + 1, StartX, StartY, EndX, EndY, this, MoveCount++, false, true);
-                                }
-                                if (Math.Abs(XPos + 1 - EndX) < MaxDistanceX)
-                                {
-                                    EastTile = new Checker(XPos + 1, YPos, StartX, StartY, EndX, EndY, this, MoveCount++, false, true);
-                                }
-                                if (Math.Abs(YPos - 1 - EndY) < MaxDistanceY)
-                                {
-                                    SouthTile = new Checker(XPos, YPos - 1, StartX, StartY, EndX, EndY, this, MoveCount++, false, true);
-                                }
-                                if (Math.Abs(XPos - 1 - EndX) < MaxDistanceX)
-                                {
-                                    WestTile = new Checker(XPos - 1, YPos, StartX, StartY, EndX, EndY, this, MoveCount++, false, true);
-                                }
-                            }
-                        }
+                        NorthTile = new Checker(XPos, YPos + 1, StartX, StartY, EndX, EndY, this, MoveCount++, false, true);
+                        EastTile = new Checker(XPos + 1, YPos, StartX, StartY, EndX, EndY, this, MoveCount++, false, true);
+                        SouthTile = new Checker(XPos, YPos - 1, StartX, StartY, EndX, EndY, this, MoveCount++, false, true);
+                        WestTile = new Checker(XPos - 1, YPos, StartX, StartY, EndX, EndY, this, MoveCount++, false, true);
                     }
                 }
             }

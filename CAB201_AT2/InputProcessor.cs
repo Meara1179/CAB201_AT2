@@ -12,7 +12,6 @@ namespace CAB201_AT2
         Obstacle obCreator = new Obstacle();
         Map mapCreator = new Map();
         Checker checker = new Checker();
-        Pathfinder pathfinder = new Pathfinder();
 
         /// <summary>
         /// Method that reads the user's input and processes it using the InputReader method, then calls itself afterwards.
@@ -143,9 +142,12 @@ namespace CAB201_AT2
                     // TODO Implement Path method in Map
                     if (ValidateNumArgs(inputArgs[1], inputArgs[2]) && ValidateNumArgs(inputArgs[3], inputArgs[4]))
                     {
-                        pathfinder.StartPath(int.Parse(inputArgs[1]), int.Parse(inputArgs[2]),
-                        int.Parse(inputArgs[3]), int.Parse(inputArgs[4]), mapCreator.ReturnObstacleList());
-                        Console.WriteLine("Test");
+                        Pathfinder pathfinder = new Pathfinder();
+                        Tuple<Point, Point> startAndTarget = pathfinder.CreateStartAndTarget(int.Parse(inputArgs[1]), int.Parse(inputArgs[2]),
+                        int.Parse(inputArgs[3]), int.Parse(inputArgs[4]));
+
+                        List<Node> path = pathfinder.StartPath(startAndTarget.Item1, startAndTarget.Item2);
+                        pathfinder.ProcessPath(path);
                     }
                     break;
                 // Reposts the help text.
