@@ -34,14 +34,14 @@ namespace CAB201_AT2
             bool pathFound = start.Equals(target);
 
             Node? endNode = null;
-            int maxIteration = 6000;
+            int maxIteration = 10000;
             int currentIteration = 0;
 
             while (openNodes.Any() && (!pathFound) && (++currentIteration <= maxIteration))
             {
                 if (currentIteration == maxIteration - 1)
                 {
-                    Console.WriteLine("SIGH");
+                    Console.WriteLine("Timed Out");
                 }
 
                 Node current = this.FindLowestCost(openNodes);
@@ -64,31 +64,10 @@ namespace CAB201_AT2
                         neighbour.ParentNode = current;
                     }
 
-                    //bool canAddOpen = true;
-                    //for (int i = 0; i < openNodes.Count; i++)
-                    //{
-                    //    if (neighbour.Equals(openNodes[i]))
-                    //    {
-                    //        canAddOpen = false;
-                    //        break;
-                    //    }
-                    //}
-                    //bool canAddClosed = true;
-                    //for (int i = 0; i < closedNodes.Count; i++)
-                    //{
-                    //    if (neighbour.Equals(closedNodes[i]))
-                    //    {
-                    //        canAddClosed = false;
-                    //        break;
-                    //    }
-                    //}
-
-                    //Point neighbourPoint = new Point(neighbour.X, neighbour.Y);
                     if (neighbour.Equals(target))
                     {
                         updateNeighbour();
                         pathFound = true;
-                        Console.WriteLine("FOUND");
                         break;
                     }
                     else if (!openNodes.Contains(neighbour) && !closedNodes.Contains(neighbour))
@@ -96,12 +75,6 @@ namespace CAB201_AT2
                         updateNeighbour();
                         openNodes.Add(neighbour);
                     }
-                    //else if (neighbour.G > newG)
-                    //{
-                    //    updateNeighbour();
-                    //    openNodes.Add(neighbour);
-                    //    closedNodes.Remove(neighbour);
-                    //}
                 }
             }
 
@@ -117,44 +90,52 @@ namespace CAB201_AT2
                 }
                 path.Reverse();
             }
+            else
+            {
+                Console.WriteLine("There is no safe path to the objective.");
+            }
             return path;
         }
 
         public void ProcessPath(List<Node> path)
         {
-            List<Tuple<string, int>> directions = new List<Tuple<string, int>>();
+            List<List<string>> directionsList = new List<List<string>>();
+            List<string> directions = new List<string>();
             string currDir = "";
-            string prevDir = "";
-            int count = -1;
 
             for (int i = 0; i < path.Count - 1; i++)
             {
-                count++;
                 if (path[i].Y < path[i + 1].Y) { currDir = "north"; }
                 else if (path[i].X < path[i + 1].X) { currDir = "east"; }
                 else if (path[i].Y > path[i + 1].Y) { currDir = "south"; }
                 else if (path[i].X > path[i + 1].X) { currDir = "west"; }
-                if (i == 0) { prevDir = currDir; }
 
-                if (currDir != prevDir)
+                if (directions.Contains(currDir) || i == 0)
                 {
-                    directions.Add(new Tuple<string, int>(prevDir, count));
-                    count = 0;
+                    directions.Add(currDir);
                 }
-                if (i == path.Count - 2) directions.Add(new Tuple<string, int>(prevDir, count + 1));
-                prevDir = currDir;
+                else if (!directions.Contains(currDir))
+                {
+                    directionsList.Add(directions);
+                    directions = new List<string>();
+                    directions.Add(currDir);
+                }
+                if (i == path.Count - 2)
+                {
+                    Console.WriteLine("The following path will take you to the objective:");
+                    directionsList.Add(directions);
+                }
             }
 
-            Console.WriteLine("The following path will take you to the objective:");
-            foreach(Tuple<string, int> s in directions)
+            foreach (var d in directionsList)
             {
-                if (s.Item2 <= 1)
+                if (d.Count <= 1)
                 {
-                    Console.WriteLine($"Head {s.Item1} for {s.Item2} klick");
+                    Console.WriteLine($"Head {d[0]} for {d.Count} klick.");
                 }
                 else
                 {
-                    Console.WriteLine($"Head {s.Item1} for {s.Item2} klicks");
+                    Console.WriteLine($"Head {d[0]} for {d.Count} klicks.");
                 }
             }
         }

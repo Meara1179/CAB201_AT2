@@ -64,5 +64,17 @@ namespace CAB201_AT2
         {
             return obstaclesList;
         }
+
+        public bool CheckIfDanger(int xPos, int yPos)
+        {
+            foreach (Obstacle ob in obstaclesList)
+            {
+                if (ob.CheckDanger(xPos, yPos))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }
