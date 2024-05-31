@@ -8,11 +8,18 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CAB201_AT2
+namespace CAB201_AT2.Pathfinding
 {
     internal class Pathfinder
     {
-
+        /// <summary>
+        /// Takes the supplied pair of coordinates and returns of Points
+        /// </summary>
+        /// <param name="startX"></param>
+        /// <param name="startY"></param>
+        /// <param name="endX"></param>
+        /// <param name="endY"></param>
+        /// <returns></returns>
         public Tuple<Point, Point> CreateStartAndTarget(int startX, int startY, int endX, int endY)
         {
             Point start = new Point(startX, startY);
@@ -21,6 +28,13 @@ namespace CAB201_AT2
             return Tuple.Create(start, target);
         }
 
+        /// <summary>
+        /// Attempts to find a viable path between both points, avoiding any obstacles if possible.
+        /// Returns a List of Nodes forming a path from start to target.
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="target"></param>
+        /// <returns></returns>
         public List<Node> StartPath(Point start, Point target)
         {
             List<Node> openNodes = new List<Node>();
@@ -34,20 +48,23 @@ namespace CAB201_AT2
             bool pathFound = start.Equals(target);
 
             Node? endNode = null;
-            int maxIteration = 10000;
+            const int MAX_ITERATIONS = 10000;
             int currentIteration = 0;
 
-            while (openNodes.Any() && (!pathFound) && (++currentIteration <= maxIteration))
+            // Continues looping as long as a path hasn't been found, there are still nodes in the open list,
+            // and the loop hasn't iterated for the specified limit
+            while (openNodes.Any() && !pathFound && ++currentIteration <= MAX_ITERATIONS)
             {
-                if (currentIteration == maxIteration - 1)
+                if (currentIteration == MAX_ITERATIONS - 1)
                 {
                     Console.WriteLine("Timed Out");
                 }
 
-                Node current = this.FindLowestCost(openNodes);
+                Node current = FindLowestCost(openNodes);
                 closedNodes.Add(current);
 
-                foreach (Point p in current.Neighbours)
+                // Iterates through each neighbour of the current node and checks if already in either the open or closed node list.
+                foreach (Point p in current.neighbours)
                 {
                     if (p.CheckDanger()) continue;
 
@@ -56,7 +73,7 @@ namespace CAB201_AT2
 
                     double newG = current.G + 1;
                     double newH = neighbour.FindDist(target);
-                    
+
                     void updateNeighbour()
                     {
                         neighbour.G = newG;
@@ -97,6 +114,11 @@ namespace CAB201_AT2
             return path;
         }
 
+        /// <summary>
+        /// Determines the cardinal directions between the Nodes in the path, then prints out directions instructing 
+        /// how to travel from the start to the target.
+        /// </summary>
+        /// <param name="path"></param>
         public void ProcessPath(List<Node> path)
         {
             List<List<string>> directionsList = new List<List<string>>();
@@ -140,6 +162,7 @@ namespace CAB201_AT2
             }
         }
 
+        // Returns the Node in the open list that either has the lowest cost, or the same cost and lower H.
         private Node FindLowestCost(List<Node> open)
         {
             double minCost = double.MaxValue;
@@ -154,15 +177,20 @@ namespace CAB201_AT2
                     minCost = (double)node.F;
                     minH = (double)node.H;
                 }
-                else if (node.F ==  minCost && node.H < minH)
+                else if (node.F == minCost && node.H < minH)
                 {
                     minNode = node;
                     minCost = (double)node.F;
                     minH = (double)node.H;
                 }
             }
-            open.Remove(minNode);
-            return minNode;
+            if (minNode != null)
+            {
+                open.Remove(minNode);
+                return minNode;
+            }
+            else return new Node(new Point(0, 0), 0, 0);
+
         }
     }
 }

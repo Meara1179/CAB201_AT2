@@ -8,10 +8,10 @@ namespace CAB201_AT2.Obstacles
 {
     internal class CameraObs : Obstacle
     {
-        public int Direction { get; set; }
+        private int Direction { get; }
 
         /// <summary>
-        /// Camera object constructor.
+        /// Camera obstacle constructor.
         /// </summary>
         /// <param name="xPos"></param>
         /// <param name="yPos"></param>

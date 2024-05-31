@@ -9,6 +9,9 @@ namespace CAB201_AT2
 {
     internal class Map
     {
+        /// <summary>
+        /// List which contains all obstacles that have been added by the user.
+        /// </summary>
         static public List<Obstacle> obstaclesList = new List<Obstacle>();
 
         /// <summary>
@@ -28,7 +31,6 @@ namespace CAB201_AT2
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <returns></returns>
-
         public List<List<string>> GenerateVisualMap(int swX, int swY, int width, int height)
         {
             List<List<string>> map = new List<List<string>>();
@@ -60,11 +62,21 @@ namespace CAB201_AT2
             return map;
         }
 
+        /// <summary>
+        /// Returns the list of created obstacles.
+        /// </summary>
+        /// <returns></returns>
         public List<Obstacle> ReturnObstacleList()
         {
             return obstaclesList;
         }
 
+        /// <summary>
+        /// Iterates through the obstacle list, checking if the supplied coordinates fall within the range of any obstacles.
+        /// </summary>
+        /// <param name="xPos"></param>
+        /// <param name="yPos"></param>
+        /// <returns></returns>
         public bool CheckIfDanger(int xPos, int yPos)
         {
             foreach (Obstacle ob in obstaclesList)

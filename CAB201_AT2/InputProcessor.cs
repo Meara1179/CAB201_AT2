@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CAB201_AT2.Obstacles;
+using CAB201_AT2.Pathfinding;
 
 namespace CAB201_AT2
 {
@@ -11,13 +12,26 @@ namespace CAB201_AT2
     {
         Map mapCreator = new Map();
 
+        // The help text as a constant string.
+        const string HELP_TEXT = "Valid commands are:\n" +
+        "add guard <x> <y>: registers a guard obstacle\n" +
+        "add fence <x> <y> <orientation> <length>: registers a fence obstacle. Orientation must be 'east' or 'north'.\n" +
+        "add sensor <x> <y> <radius>: registers a sensor obstacle\n" +
+        "add camera <x> <y> <direction>: registers a camera obstacle. Direction must be 'north', 'south', 'east' or 'west'.\n" +
+        "check <x> <y>: checks whether a location and its surroundings are safe\n" +
+        "map <x> <y> <width> <height>: draws a text-based map of registered obstacles\n" +
+        "path <agent x> <agent y> <objective x> <objective y>: finds a path free of obstacles\n" +
+        "help: displays this help message\n" +
+        "exit: closes this program";
+
         /// <summary>
         /// Method that reads the user's input and processes it using the InputReader method, then calls itself afterwards.
         /// </summary>
         public void StartReadInput()
         {
             Console.WriteLine("Enter command:");
-            string input = Console.ReadLine();
+            string input = Console.ReadLine() ?? "";
+            input = input.Trim();
             if (input != null)
             {
                 InputReader(input);
@@ -33,7 +47,7 @@ namespace CAB201_AT2
         /// </summary>
         public void PostHelpText()
         {
-            Console.WriteLine(helpText);
+            Console.WriteLine(HELP_TEXT);
         }
 
         // Method that splits the user's input by whitespace and executes different functions based on the first input argument.
@@ -55,7 +69,6 @@ namespace CAB201_AT2
                         case "sensor":
                             AddSensor(inputArgs);
                             break;
-
                         case "camera":
                             AddCamera(inputArgs);
                             break;
@@ -80,7 +93,7 @@ namespace CAB201_AT2
                     break;
                 // Reposts the help text.
                 case "help":
-                    Console.WriteLine(helpText);
+                    Console.WriteLine(HELP_TEXT);
                     break;
                 // Exits out of the application.
                 case "exit":
@@ -95,6 +108,7 @@ namespace CAB201_AT2
             }
         }
 
+        // Validates and parses the supplied string array, then creates a new Guard obstacle using the inputted parameters 
         private void AddGuard(string[] inputArgs)
         {
             // Checks if the right amount of arguments were provided.
@@ -119,6 +133,7 @@ namespace CAB201_AT2
             }
         }
 
+        // Validates and parses the supplied string array, then creates a new Sensor obstacle using the inputted parameters 
         private void AddSensor(string[] inputArgs)
         {
             // Checks if the right amount of arguments were provided.
@@ -131,7 +146,7 @@ namespace CAB201_AT2
             {
                 Console.WriteLine("Coordinates are not valid integers.");
             }
-            
+
             else if (ValidateIntArgs(inputArgs[2], inputArgs[3]) && ValidateDoubleArgs(inputArgs[4]))
             {
                 mapCreator.AddObstacle(new SensorObs(int.Parse(inputArgs[2]), int.Parse(inputArgs[3]), double.Parse(inputArgs[4])));
@@ -139,6 +154,7 @@ namespace CAB201_AT2
             }
         }
 
+        // Validates and parses the supplied string array, then creates a new Camera obstacle using the inputted parameters 
         private void AddCamera(string[] inputArgs)
         {
             // Checks if the right amount of arguments were provided.
@@ -167,6 +183,7 @@ namespace CAB201_AT2
             }
         }
 
+        // Validates and parses the supplied string array, then creates a new Fence obstacle using the inputted parameters 
         private void AddFence(string[] inputArgs)
         {
             // Checks if the right amount of arguments were provided.
@@ -201,6 +218,7 @@ namespace CAB201_AT2
             }
         }
 
+        // Takes the supplied arguments and checks if the coordinates contain a danger, then returns which adjacent directions are safe.
         private void CheckCommand(string[] inputArgs)
         {
             // Checks if the right amount of arguments were provided.
@@ -219,7 +237,8 @@ namespace CAB201_AT2
                 new Checker(int.Parse(inputArgs[1]), int.Parse(inputArgs[2]));
             }
         }
-
+        
+        // Creates a map of a specified width and height from the specified coordinates, displaying all tiles and if they contain an obstacle.
         private void MapCommand(string[] inputArgs)
         {
             List<List<string>> visualMap = new List<List<string>>();
@@ -253,6 +272,7 @@ namespace CAB201_AT2
             }
         }
 
+        // Tries to find a safe path between 2 coordinates, going around any obstacles if possible, then prints out directions. 
         private void PathCommand(string[] inputArgs)
         {
             if (inputArgs.Count() != 5)
@@ -297,14 +317,6 @@ namespace CAB201_AT2
             bool validArgs = double.TryParse(xArg, out double x);
             return validArgs;
         }
-        // Overload method that also tests if the fifth input can successfully be parsed as a double.
-        private bool ValidateNumArgs(string xArg, string yArg, string radArg)
-        {
-            bool validArgs = int.TryParse(xArg, out int x);
-            validArgs = int.TryParse(yArg, out int y) && validArgs;
-            validArgs = double.TryParse(radArg, out double rad) && validArgs;
-            return validArgs;
-        }
         // Private method that checks the direction input and returns the direction's equivalent numeric value as a string.
         private string ProcessDirectionInput(string input)
         {
@@ -322,17 +334,5 @@ namespace CAB201_AT2
                     return "NOT VALID";
             }
         }
-
-        // The help text as a constant string.
-        const string helpText = "Valid commands are:\n" +
-        "add guard <x> <y>: registers a guard obstacle\n" +
-        "add fence <x> <y> <orientation> <length>: registers a fence obstacle. Orientation must be 'east' or 'north'.\n" +
-        "add sensor <x> <y> <radius>: registers a sensor obstacle\n" +
-        "add camera <x> <y> <direction>: registers a camera obstacle. Direction must be 'north', 'south', 'east' or 'west'.\n" +
-        "check <x> <y>: checks whether a location and its surroundings are safe\n" +
-        "map <x> <y> <width> <height>: draws a text-based map of registered obstacles\n" +
-        "path <agent x> <agent y> <objective x> <objective y>: finds a path free of obstacles\n" +
-        "help: displays this help message\n" +
-        "exit: closes this program";
     }
 }

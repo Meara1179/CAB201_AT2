@@ -8,8 +8,14 @@ namespace CAB201_AT2.Obstacles
 {
     internal class SensorObs : Obstacle
     {
-        public double Radius { get; set; }
+        private double Radius { get; set; }
 
+        /// <summary>
+        /// Sensor obstacle constructor.
+        /// </summary>
+        /// <param name="xPos"></param>
+        /// <param name="yPos"></param>
+        /// <param name="radius"></param>
         public SensorObs(int xPos, int yPos, double radius)
         {
             XPos = xPos;

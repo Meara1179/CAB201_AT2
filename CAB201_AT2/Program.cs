@@ -2,6 +2,10 @@
 {
     internal class Program
     {
+        /// <summary>
+        /// Entry method called on startup.
+        /// </summary>
+        /// <param name="args"></param>
         static void Main(string[] args)
         {
             InputProcessor processor = new InputProcessor();

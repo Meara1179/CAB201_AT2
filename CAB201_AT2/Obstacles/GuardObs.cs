@@ -8,6 +8,11 @@ namespace CAB201_AT2.Obstacles
 {
     internal class GuardObs : Obstacle
     {
+        /// <summary>
+        /// Guard obstacle constructor.
+        /// </summary>
+        /// <param name="xPos"></param>
+        /// <param name="yPos"></param>
         public GuardObs(int xPos, int yPos) 
         {
             XPos = xPos;

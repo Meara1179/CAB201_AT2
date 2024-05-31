@@ -8,9 +8,16 @@ namespace CAB201_AT2.Obstacles
 {
     internal class FenceObs : Obstacle
     {
-        public int Direction;
-        public int Length;
+        private int Direction;
+        private int Length;
 
+        /// <summary>
+        /// Fence obstacle constructor.
+        /// </summary>
+        /// <param name="xPos"></param>
+        /// <param name="yPos"></param>
+        /// <param name="direction"></param>
+        /// <param name="length"></param>
         public FenceObs(int xPos, int yPos, int direction, int length)
         {
             XPos = xPos;
